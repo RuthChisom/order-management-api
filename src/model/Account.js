@@ -6,8 +6,7 @@ const accountSchema = new Schema({
     userName: {type: String, required:true},
     email: {type: String, required:'Email Address is required', unique: true},
     password: {type: String, required:true},
-    role: {type: String, enum: ["customer", "admin"], required:true},
-    gender: {type: String, enum: ["male", "female"]},
+    role: {type: String, enum: ["customer", "vendor", "admin"], required:true}
 },
 {timestamps:true}
 );
