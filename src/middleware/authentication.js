@@ -30,3 +30,10 @@ exports.checkIfAdmin = (req, res, next) => {
     }
     next();
 }
+
+exports.checkIfVendor = (req, res, next) => {
+    if(req.account.role!='vendor'){
+        return res.status(401).json({message: "This route is restricted to vendors"});
+    }
+    next();
+}
