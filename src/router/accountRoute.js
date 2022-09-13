@@ -3,7 +3,8 @@ const controller = require('../controller/accountController');
 const {authenticateAccount, checkIfAdmin} = require('../middleware/authentication');
 
 router
-.get("/accounts", authenticateAccount, checkIfAdmin, controller.getAllAccounts)
+// .get("/accounts", authenticateAccount, checkIfAdmin, controller.getAllAccounts)
+.get("/accounts", controller.getAllAccounts)  // - replace this when live
 .post("/register", controller.registerNewAccount)
 .post("/login", controller.loginAccount)
 .post("/forgot-password", controller.forgotPassword)
