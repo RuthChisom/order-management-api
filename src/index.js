@@ -1,5 +1,6 @@
 const express = require('express');
 const {json} = require('express');
+const bodyParser = require('body-parser');
 var cors = require('cors');
 
 const connectDB = require('./config/database');
@@ -9,6 +10,7 @@ const productRoute = require('./router/productRoute');
 connectDB();
 
 const app = express();
+app.use(bodyParser.json({type:['applicaion/json','text/plain']}));
 app.use(json());
 app.use(cors());  // this fixes No 'Access-Control-Allow-Origin' header issue
 app.use('/', accountRoute);

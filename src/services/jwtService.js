@@ -7,7 +7,7 @@ exports.createToken = (account) => {
     try{
         const payload = { //do not add sensitive info to the payload
             id: account._id,
-            userName: account.userName,
+            email: account.email,
             role: account.role,
         };
         let token = jwt.sign(

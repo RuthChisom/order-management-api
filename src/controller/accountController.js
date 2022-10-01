@@ -16,18 +16,17 @@ exports.generatePassword = () => {
 // register a new account
 exports.registerNewAccount = (req, res) => {
     // try{
-        // get account details from request body and check if a account with this username exists
-        Account.findOne({userName: req.body.userName}, (err, existingAccount) => {
+        // get account details from request body and check if a account with this email exists
+        Account.findOne({email: req.body.email}, (err, existingAccount) => {
             if(err){
                 console.error(err);
                 return res.status(500).json({message: "An error occured! Please try again later!"});
             }
             if(existingAccount){
-                return res.status(400).json({message: "An account with this username already exists!!"});
+                return res.status(400).json({message: "An account with this email already exists!!"});
             }
-        })
-         // create a new account
-        let created = Account.create(req.body, (err, newAccount) => {
+             // else, create a new account
+            let created = Account.create(req.body, (err, newAccount) => {
             if(err){
                 console.error(err);
                 return res.status(500).json({message: "An error occured! Please try again later!"});
@@ -56,14 +55,19 @@ exports.registerNewAccount = (req, res) => {
                     if(!token){
                         return res.status(500).json({message: "Failed to sign token!"});
                     }
+                    //set cookie
+                    res.cookie('nToken',token, {maxAge: 900000, httpOnly: true});
                     // send token to account
                     console.log(token)
                     return res.status(200).json({
-                        message: "Account Registration Successful",
+                        message: "Account Registration Successful! Taking you in...",
+                        accessToken: token
                     })
                 })
             })
         });
+        })
+        
 }
 
 // get all accounts
@@ -92,13 +96,13 @@ exports.getAllAccounts = async(req, res) => {
 
 exports.loginAccount = (req, res) =>{
     // check if account exists
-    Account.findOne({userName: req.body.userName}, (err, foundAccount) => {
+    Account.findOne({email: req.body.email}, (err, foundAccount) => {
         if(err){
             console.error({err});
             return res.status(500).json({message: "Unable to login! Please try again later"});
         }
         if(!foundAccount){
-            return res.status(401).json({message: "Username Not Found!!"})
+            return res.status(401).json({message: "Email Not Found!!"})
         }
         // check if password is correct - we cannot compare the password with equals because it is hashed
         let match = bcrypt.compareSync(req.body.password, foundAccount.password);
@@ -116,6 +120,7 @@ exports.loginAccount = (req, res) =>{
         console.log(token);
         return res.status(200).json({
             message: "Logged In Successfully",
+            accessToken: token
         })
     })
     
@@ -123,13 +128,13 @@ exports.loginAccount = (req, res) =>{
 
 exports.forgotPassword = (req, res) =>{
     // check if account exists
-    Account.findOne({userName: req.body.userName}, (err, foundAccount) => {
+    Account.findOne({email: req.body.email}, (err, foundAccount) => {
         if(err){
             console.error({err});
             return res.status(500).json({message: "Unable to login! Please try again later"});
         }
         if(!foundAccount){
-            return res.status(401).json({message: "Username Not Found!!"})
+            return res.status(401).json({message: "Email Not Found!!"})
         }
         console.log("account found:",foundAccount);
         // generate new password
@@ -231,7 +236,7 @@ exports.deleteAccount = async(req, res) => {
 // logout of an account
 exports.logoutAccount = (req, res) =>{
     if(!req.headers.authorization){
-        return res.status(401).json({message: "Authorization Header required"});
+        return res.status(401).json({message: "Authorization Header required, Please login!"});
     }
     let splittedHeader = req.headers.authorization.split(' ');
     if(splittedHeader[0] !== 'Bearer'){
